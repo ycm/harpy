@@ -9,9 +9,15 @@ hi default link HarpyFileNotFound WarningMsg
 hi default link HarpyHelpText     Comment
 hi default link HarpyMenuBorder   PMenu
 
-prop_type_add('harpy_prop_file_not_found', {highlight: 'HarpyFileNotFound'})
-prop_type_add('harpy_prop_selected_file', {highlight: 'HarpySelectedFile'})
-prop_type_add('harpy_prop_help_text', {highlight: 'HarpyHelpText'})
+if prop_type_get('harpy_prop_file_not_found') == {}
+    prop_type_add('harpy_prop_file_not_found', {highlight: 'HarpyFileNotFound'})
+endif
+if prop_type_get('harpy_prop_selected_file') == {}
+    prop_type_add('harpy_prop_selected_file', {highlight: 'HarpySelectedFile'})
+endif
+if prop_type_get('harpy_prop_help_text') == {}
+    prop_type_add('harpy_prop_help_text', {highlight: 'HarpyHelpText'})
+endif
 
 g:harpy_info = {show_help: 0}
 
