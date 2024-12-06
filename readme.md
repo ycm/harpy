@@ -4,7 +4,13 @@
 
 minimal vim9script implementation of basic features in ![harpoon](https://github.com/ThePrimeagen/harpoon)
 
+# Setup
+
 ```vim
-command Harpy Harpy()
-nnoremap <silent> <leader>l :Harpy<cr>
+Plug 'ycm/harpy'
+```
+
+```vim
+nnoremap <silent> <leader>ll :Harpy<cr>
+nnoremap <silent> <leader>la :HarpyAdd<cr>
 ```

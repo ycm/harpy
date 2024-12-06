@@ -16,9 +16,12 @@ vim9script
 # <TODO> write docs
 
 g:harpy_file_name = '.harpylist'
-g:harpy_info_text = $'Harpylist path: {g:harpy_file_name}.'
-g:harpy_pointer = '> '
-g:harpy_no_pointer = '  '
+g:harpy_info_text = $'Harpylist path: {g:harpy_file_name}'
+
+g:harpy_options = {
+    pointer: '> ',
+    no_pointer: '  '
+}
 
 export def HarpyRemoveMenuItem()
     if g:harpy_valid_files->len() == 0
@@ -93,13 +96,17 @@ export def HarpyAdd()
 enddef
 
 export def HarpyRefreshWindow(winid: number)
+    if g:harpy_valid_files->len() == 0
+        return
+    endif
+
     var curr_ = g:harpy_sel_idx
     var prev_ = max([0, curr_ - 1])
     var next_ = min([curr_ + 1, g:harpy_n_valid_files - 1])
     
-    var prev_text = g:harpy_menu[prev_].text->substitute($'^{g:harpy_pointer}', g:harpy_no_pointer, 'g')
-    var next_text = g:harpy_menu[next_].text->substitute($'^{g:harpy_pointer}', g:harpy_no_pointer, 'g')
-    var curr_text = g:harpy_menu[curr_].text->substitute($'^{g:harpy_no_pointer}', g:harpy_pointer, 'g')
+    var prev_text = g:harpy_menu[prev_].text->substitute($'^{g:harpy_options.pointer}', g:harpy_options.no_pointer, 'g')
+    var next_text = g:harpy_menu[next_].text->substitute($'^{g:harpy_options.pointer}', g:harpy_options.no_pointer, 'g')
+    var curr_text = g:harpy_menu[curr_].text->substitute($'^{g:harpy_options.no_pointer}', g:harpy_options.pointer, 'g')
 
     g:harpy_menu[prev_] = {text: prev_text}
     g:harpy_menu[next_] = {text: next_text}
@@ -201,9 +208,9 @@ export def HarpyCreateMenu(): any
 
     for [i, file] in items(g:harpy_valid_files)
         if i == g:harpy_sel_idx
-            add(menu_lines, HarpyFormatString($'{g:harpy_pointer}{file}', 'harpy_prop_selected_file'))
+            add(menu_lines, HarpyFormatString($'{g:harpy_options.pointer}{file}', 'harpy_prop_selected_file'))
         else
-            add(menu_lines, {text: $'{g:harpy_no_pointer}{file}'})
+            add(menu_lines, {text: $'{g:harpy_options.no_pointer}{file}'})
         endif
     endfor
 
