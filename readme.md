@@ -17,7 +17,10 @@ Plug 'ycm/harpy'
 
 Manual installation: Add `harpy.vim` to `.vim/plugin/`, or use the Vim8+ pack system, etc.
 
-⚠️ **NOTE**: `set autochdir` is **not recommended**, as it renders harpy mostly useless.
+⚠️ **NOTE**: `set autochdir` is **not recommended**, since harpy stores its filelist in the cwd. This also means you might want to `ignore` the filelist in your project. 
+```bash
+echo ".harpylist" >> .gitignore
+```
 
 ## Default usage
 
@@ -45,19 +48,19 @@ nnoremap <silent> <leader>la :HarpyAdd<cr>
 ```vim
 g:harpy_options = {
     file_name: '.harpylist',
-    pointer: '> ',
+    min_width: 40,
+    pointer:    '> ',
     no_pointer: '  ',
-    min_width: 50,
-    keys_down: ['j'],
-    keys_up: ['k'],
-    keys_open_file: ['<Enter>', '<Space>'],
+    keys_down:            ['j'],
+    keys_up:              ['k'],
+    keys_open_file:       ['<Enter>', '<Space>'],
     keys_clear_not_found: ['D'],
-    keys_remove_entry: ['X'],
-    keys_split_on_top: ['S'],
+    keys_remove_entry:    ['X'],
+    keys_split_on_top:    ['S'],
     keys_split_on_bottom: ['s'],
-    keys_split_on_left: ['V'],
-    keys_split_on_right: ['v'],
-    keys_toggle_help: ['h']
+    keys_split_on_left:   ['V'],
+    keys_split_on_right:  ['v'],
+    keys_toggle_help:     ['h']
 }
 ```
 
@@ -85,10 +88,25 @@ let g:harpy_user_options = {
 
 **Colors**
 
-The following highlight groups can be customized:
+Below are the highlight groups that you can customize, along with their defaults.
 ```
-HarpySelectedFile
-HarpyFileNotFound
-HarpyHelpText
-HarpyMenuBorder
+hi default link HarpySelectedFile PMenuSel
+hi default link HarpyFileNotFound WarningMsg
+hi default link HarpyHelpText     Comment
+hi default link HarpyMenuBorder   PMenu
 ```
+
+## TODOs
+- [x] add ability to clear not-found list
+- [x] add ability to enter buffers
+- [x] add ability to delete files
+- [x] structure as plugin
+- [x] test on some other project dirs
+- [x] add option dict instead of global
+- [ ] adding files from the command line (e.g. `:HarpyAdd path/to/file`)
+- [ ] reordering menu items
+- [ ] support arrow and modifier keys
+- [ ] support multikey input (e.g. `dd` to delete)
+- [ ] optimizing the logic overall (harpy is naively implemented right now)
+- [ ] write docs.txt
+- [ ] undo delete?

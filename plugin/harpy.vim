@@ -4,23 +4,22 @@ endif
 
 vim9script
 
-# <DONE> add ability to enter buffers
-# <DONE> add ability to clear not-found list
-# <DONE> add ability to delete files
-# <DONE> structure as plugin
-# <DONE> test on some other project dirs
-# <DONE> add option dict instead of global
-# <TODO> smarter path detection - shorten paths to respect CWD
-# <TODO> add ability to reorder files
-# <TODO> add ability to call HarpyAdd() with file argument(s)
-# <TODO> add arrow key support
-# <TODO> write docs
+hi default link HarpySelectedFile PMenuSel
+hi default link HarpyFileNotFound WarningMsg
+hi default link HarpyHelpText     Comment
+hi default link HarpyMenuBorder   PMenu
+
+prop_type_add('harpy_prop_file_not_found', {highlight: 'HarpyFileNotFound'})
+prop_type_add('harpy_prop_selected_file', {highlight: 'HarpySelectedFile'})
+prop_type_add('harpy_prop_help_text', {highlight: 'HarpyHelpText'})
+
+g:harpy_info = {show_help: 0}
 
 g:harpy_options = {
     file_name: '.harpylist',
-    pointer: '> ',
+    min_width: 40,
+    pointer:    '> ',
     no_pointer: '  ',
-    min_width: 50,
     keys_down:            ['j'],
     keys_up:              ['k'],
     keys_open_file:       ['<Enter>', '<Space>'],
@@ -33,71 +32,22 @@ g:harpy_options = {
     keys_toggle_help:     ['h']
 }
 
-g:harpy_info = {show_help: 0}
-
-hi default link HarpySelectedFile Normal
-hi default link HarpyFileNotFound Comment
-hi default link HarpyHelpText Comment
-
-prop_type_add('harpy_prop_file_not_found', {highlight: 'HarpyFileNotFound'})
-prop_type_add('harpy_prop_selected_file', {highlight: 'HarpySelectedFile'})
-prop_type_add('harpy_prop_help_text', {highlight: 'HarpyHelpText'})
-
-export def HarpyRemoveMenuItem()
-    if g:harpy_info.valid_files->len() == 0
-        return
-    endif
-    remove(g:harpy_info.valid_files, g:harpy_info.sel_idx)
-    echom "Removed an item"
-    HarpySave()
+export def Harpy()
+    HarpyLoadSettings()
     HarpyLoadFiles()
-    g:harpy_info.menu = HarpyCreateMenu()
-    HarpyRefreshWindow()
-enddef
-
-export def HarpyClearNotFound()
-    if g:harpy_info.invalid_files->len() == 0
-        return
-    endif
-
-    unlet g:harpy_info.invalid_files[:]
-    HarpySave()
-    HarpyLoadFiles()
-    g:harpy_info.menu = HarpyCreateMenu()
-    HarpyRefreshWindow()
-enddef
-
-export def HarpyHandleExit(winid: number, option: number)
-    HarpySave()
-enddef
-
-export def HarpySave()
-    var lines_to_write = [g:harpy_info.sel_idx] + g:harpy_info.valid_files + g:harpy_info.invalid_files
-    writefile(lines_to_write, g:harpy_options.file_name)
-enddef
-
-export def HarpyLoadFiles()
-    if !filereadable(g:harpy_options.file_name)
-        writefile([0], g:harpy_options.file_name)
-    endif
-    var file_list = readfile(g:harpy_options.file_name)
-    var found = []
-    var not_found = []
-    var sel_idx = str2nr(file_list[0])
-    for file in file_list[1 : ]
-        if filereadable(file)
-            found->add(file)
-        else
-            not_found->add(file)
-        endif
-    endfor
-    g:harpy_info.valid_files = found
-    g:harpy_info.invalid_files = not_found
-
-    sel_idx = max([sel_idx, 0])
-    sel_idx = min([sel_idx, g:harpy_info.valid_files->len() - 1])
-
-    g:harpy_info.sel_idx = sel_idx
+    g:harpy_info.menu_lines = HarpyCreateMenu()
+    g:harpy_info.winid = popup_create(g:harpy_info.menu_lines, {
+        title: $' harpy ',
+        drag: 1,
+        border: [],
+        borderhighlight: ['HarpyMenuBorder'],
+        wrap: 0,
+        padding: [1, 3, 1, 3], # U, R, D, L
+        minwidth: g:harpy_options.min_width,
+        filter: 'HarpyKeyHandler',
+        mapping: 0,
+        callback: 'HarpyHandleExit'
+    })
 enddef
 
 export def HarpyAdd()
@@ -121,9 +71,66 @@ export def HarpyAdd()
     endif
 enddef
 
-export def HarpyRefreshWindow()
+def HarpyRemoveMenuItem()
     if g:harpy_info.valid_files->len() == 0
-        popup_settext(g:harpy_info.winid, g:harpy_info.menu)
+        return
+    endif
+    remove(g:harpy_info.valid_files, g:harpy_info.sel_idx)
+    echom "Removed an item"
+    HarpySave()
+    HarpyLoadFiles()
+    g:harpy_info.menu_lines = HarpyCreateMenu()
+    HarpyRefreshWindow()
+enddef
+
+def HarpyClearNotFound()
+    if g:harpy_info.invalid_files->len() == 0
+        return
+    endif
+
+    unlet g:harpy_info.invalid_files[:]
+    HarpySave()
+    HarpyLoadFiles()
+    g:harpy_info.menu_lines = HarpyCreateMenu()
+    HarpyRefreshWindow()
+enddef
+
+def HarpyHandleExit(winid: number, option: number)
+    HarpySave()
+enddef
+
+def HarpySave()
+    var lines_to_write = [g:harpy_info.sel_idx] + g:harpy_info.valid_files + g:harpy_info.invalid_files
+    writefile(lines_to_write, g:harpy_options.file_name)
+enddef
+
+def HarpyLoadFiles()
+    if !filereadable(g:harpy_options.file_name)
+        writefile([0], g:harpy_options.file_name)
+    endif
+    var file_list = readfile(g:harpy_options.file_name)
+    var found = []
+    var not_found = []
+    var sel_idx = str2nr(file_list[0])
+    for file in file_list[1 : ]
+        if filereadable(file)
+            found->add(file)
+        else
+            not_found->add(file)
+        endif
+    endfor
+    g:harpy_info.valid_files = found
+    g:harpy_info.invalid_files = not_found
+
+    sel_idx = max([sel_idx, 0])
+    sel_idx = min([sel_idx, g:harpy_info.valid_files->len() - 1])
+
+    g:harpy_info.sel_idx = sel_idx
+enddef
+
+def HarpyRefreshWindow()
+    if g:harpy_info.valid_files->len() == 0
+        popup_settext(g:harpy_info.winid, g:harpy_info.menu_lines)
         return
     endif
 
@@ -131,20 +138,20 @@ export def HarpyRefreshWindow()
     var prev_ = max([0, curr_ - 1])
     var next_ = min([curr_ + 1, g:harpy_info.valid_files->len() - 1])
     
-    var prev_text = g:harpy_info.menu[prev_].text->substitute($'^{g:harpy_options.pointer}', g:harpy_options.no_pointer, 'g')
-    var next_text = g:harpy_info.menu[next_].text->substitute($'^{g:harpy_options.pointer}', g:harpy_options.no_pointer, 'g')
-    var curr_text = g:harpy_info.menu[curr_].text->substitute($'^{g:harpy_options.no_pointer}', g:harpy_options.pointer, 'g')
+    var prev_text = g:harpy_info.menu_lines[prev_].text->substitute($'^{g:harpy_options.pointer}', g:harpy_options.no_pointer, 'g')
+    var next_text = g:harpy_info.menu_lines[next_].text->substitute($'^{g:harpy_options.pointer}', g:harpy_options.no_pointer, 'g')
+    var curr_text = g:harpy_info.menu_lines[curr_].text->substitute($'^{g:harpy_options.no_pointer}', g:harpy_options.pointer, 'g')
 
-    g:harpy_info.menu[prev_] = {text: prev_text}
-    g:harpy_info.menu[next_] = {text: next_text}
-    g:harpy_info.menu[curr_] = HarpyFormatString(curr_text, 'harpy_prop_selected_file')
+    g:harpy_info.menu_lines[prev_] = {text: prev_text}
+    g:harpy_info.menu_lines[next_] = {text: next_text}
+    g:harpy_info.menu_lines[curr_] = HarpyFormatString(curr_text, 'harpy_prop_selected_file')
 
-    popup_settext(g:harpy_info.winid, g:harpy_info.menu)
+    popup_settext(g:harpy_info.winid, g:harpy_info.menu_lines)
 enddef
 
-export def HarpyMakeHelpText(): any
+def HarpyMakeHelpText(): any
     var help_lines = [{}]
-    help_lines->add(HarpyFormatString($'Harpylist path: {g:harpy_options.file_name}', 'harpy_prop_help_text'))
+    help_lines->add(HarpyFormatString($'Harpylist filename: {g:harpy_options.file_name}', 'harpy_prop_help_text'))
     help_lines->add(HarpyFormatString($"Navigation: {join(g:harpy_options.keys_down + g:harpy_options.keys_up, '/')}", 'harpy_prop_help_text'))
     help_lines->add(HarpyFormatString($"Open file: {join(g:harpy_options.keys_open_file, '/')}", 'harpy_prop_help_text'))
     help_lines->add(HarpyFormatString($"Open in split on left (right): {join(g:harpy_options.keys_split_on_left, '/')} ({join(g:harpy_options.keys_split_on_right, '/')})", 'harpy_prop_help_text'))
@@ -154,15 +161,15 @@ export def HarpyMakeHelpText(): any
     return help_lines
 enddef
 
-export def HarpyToggleHelp()
+def HarpyToggleHelp()
     if g:harpy_info.show_help == 1
-        g:harpy_info.menu->extend(HarpyMakeHelpText())
+        g:harpy_info.menu_lines->extend(HarpyMakeHelpText())
     else
-        g:harpy_info.menu = g:harpy_info.menu[: -(HarpyMakeHelpText()->len() + 1)]
+        g:harpy_info.menu_lines = g:harpy_info.menu_lines[: -(HarpyMakeHelpText()->len() + 1)]
     endif
 enddef
 
-export def HarpyOpenWindowHandler(winid: number, option: string): bool
+def HarpyOpenWindowHandler(winid: number, option: string): bool
     if g:harpy_info.valid_files->len() == 0
         return false
     endif
@@ -208,7 +215,7 @@ export def HarpyOpenWindowHandler(winid: number, option: string): bool
     return opened
 enddef
 
-export def HarpyKeyHandler(winid: number, key: string): any
+def HarpyKeyHandler(winid: number, key: string): any
     var k_ = (key == ' ') ? '<Space>' : key
     k_ = (key == '') ? '<Enter>' : key
 
@@ -245,11 +252,11 @@ export def HarpyKeyHandler(winid: number, key: string): any
     return true
 enddef
 
-export def HarpyFormatString(str: string, prop: string): any
+def HarpyFormatString(str: string, prop: string): any
     return {text: str, props: [{col: 1, length: str->len(), type: prop}]}
 enddef
 
-export def HarpyCreateMenu(): any
+def HarpyCreateMenu(): any
     var menu_lines = []
     if g:harpy_info.valid_files->len() == 0
         menu_lines += [{text: 'No valid files found!'}, {}]
@@ -283,30 +290,12 @@ export def HarpyCreateMenu(): any
     return menu_lines
 enddef
 
-export def HarpyLoadSettings()
+def HarpyLoadSettings()
     if exists('g:harpy_user_options')
         for [opt, val] in g:harpy_user_options->items()
             g:harpy_options[opt] = val
         endfor
     endif
-enddef
-
-export def Harpy()
-    HarpyLoadSettings()
-    HarpyLoadFiles()
-    g:harpy_info.menu = HarpyCreateMenu()
-    g:harpy_info.winid = popup_create(g:harpy_info.menu, {
-        title: $' harpy ',
-        drag: 1,
-        border: [],
-        borderhighlight: ['HarpyMenuBorder'],
-        wrap: 0,
-        padding: [1, 3, 1, 3], # U, R, D, L
-        minwidth: g:harpy_options.min_width,
-        filter: 'HarpyKeyHandler',
-        mapping: 0,
-        callback: 'HarpyHandleExit'
-    })
 enddef
 
 command! Harpy Harpy()
