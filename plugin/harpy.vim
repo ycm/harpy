@@ -2,6 +2,8 @@ if !has('vim9script') || v:version < 900
     finish
 endif
 
+vim9script
+
 # <DONE> add ability to enter buffers
 # <DONE> add ability to clear not-found list
 # <DONE> add ability to delete files
