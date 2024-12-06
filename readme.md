@@ -19,18 +19,27 @@ Manual installation: Add `harpy.vim` to `.vim/plugin/`, or use the Vim8+ pack sy
 
 ⚠️ **NOTE**: `set autochdir` is **not recommended**, as it renders harpy mostly useless.
 
-## Usage
+## Default usage
 
-- Invoke harpy menu: `:Harpy`
-- Add the current file to harpy list: `:HarpyAdd`
+- Open the harpy menu with `:Harpy`
+- Add the current file to the harpy list with `:HarpyAdd`
+- Exit the menu with standard `popupwin` keys: `<Esc>`, `x`, `<C-c>`
+- Remove the selected file with `X`
+- Clear any deleted files with `D`
+- Navigate the filelist with `j` and `k`
+- Open the selected file with `<Enter>` or `<Space>`
+- Open the selected file as a vertical split with `V` or `v`
+- Open the selected file as a horizontal split with `S` or `s`
+- Show some help text with `h`
 
-Sample mappings:
+## Configs
+
+**Sample mappings**
+
 ```vim
 nnoremap <silent> <leader>ll :Harpy<cr>
 nnoremap <silent> <leader>la :HarpyAdd<cr>
 ```
-
-## Configs
 
 **Default options**
 ```vim
