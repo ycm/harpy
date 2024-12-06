@@ -76,6 +76,7 @@ export def HarpyLoadFiles()
 enddef
 
 export def HarpyAdd()
+    HarpyLoadSettings()
     if !exists('g:harpy_valid_files')
         HarpyLoadFiles()
     endif
@@ -228,7 +229,16 @@ export def HarpyCreateMenu(): any
     return menu_lines
 enddef
 
+export def HarpyLoadSettings()
+    if exists('g:harpy_user_options')
+        for [opt, val] in g:harpy_user_options->items()
+            g:harpy_options[opt] = val
+        endfor
+    endif
+enddef
+
 export def Harpy()
+    HarpyLoadSettings()
     HarpyLoadFiles()
     g:harpy_menu = HarpyCreateMenu()
     g:harpy_winid = popup_create(g:harpy_menu, {
