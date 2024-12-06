@@ -314,5 +314,5 @@ export def Harpy()
     })
 enddef
 
-command Harpy Harpy()
-command HarpyAdd HarpyAdd()
+command! Harpy Harpy()
+command! HarpyAdd HarpyAdd()
