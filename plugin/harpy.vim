@@ -7,12 +7,13 @@ vim9script
 # <DONE> add ability to enter buffers
 # <DONE> add ability to clear not-found list
 # <DONE> add ability to delete files
-# <TODO> add ability to reorder files
-# <TODO> add ability to call HarpyAdd() with file argument(s)
-# <TODO> add arrow key support
 # <DONE> structure as plugin
 # <DONE> test on some other project dirs
 # <DONE> add option dict instead of global
+# <TODO> smarter path detection - shorten paths to respect CWD
+# <TODO> add ability to reorder files
+# <TODO> add ability to call HarpyAdd() with file argument(s)
+# <TODO> add arrow key support
 # <TODO> write docs
 
 g:harpy_options = {
@@ -20,29 +21,23 @@ g:harpy_options = {
     pointer: '> ',
     no_pointer: '  ',
     min_width: 50,
-    keys_down: ['j'],
-    keys_up: ['k'],
-    keys_open_file: ['<Enter>', '<Space>'],
+    keys_down:            ['j'],
+    keys_up:              ['k'],
+    keys_open_file:       ['<Enter>', '<Space>'],
     keys_clear_not_found: ['D'],
-    keys_remove_entry: ['X'],
-    keys_split_on_top: ['S'],
+    keys_remove_entry:    ['X'],
+    keys_split_on_top:    ['S'],
     keys_split_on_bottom: ['s'],
-    keys_split_on_left: ['V'],
-    keys_split_on_right: ['v'],
-    keys_toggle_help: ['h']
+    keys_split_on_left:   ['V'],
+    keys_split_on_right:  ['v'],
+    keys_toggle_help:     ['h']
 }
 
 g:harpy_info = {show_help: 0}
 
-if !hlexists('HarpySelectedFile')
-    hi link HarpySelectedFile Normal
-endif
-if !hlexists('HarpyFileNotFound')
-    hi link HarpyFileNotFound Comment
-endif
-if !hlexists('HarpyHelpText')
-    hi link HarpyHelpText Comment
-endif
+hi default link HarpySelectedFile Normal
+hi default link HarpyFileNotFound Comment
+hi default link HarpyHelpText Comment
 
 prop_type_add('harpy_prop_file_not_found', {highlight: 'HarpyFileNotFound'})
 prop_type_add('harpy_prop_selected_file', {highlight: 'HarpySelectedFile'})
