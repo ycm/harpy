@@ -1,6 +1,6 @@
 # harpy
 
-[WIP] Vim9script implementation of a few basic features in ![harpoon](https://github.com/ThePrimeagen/harpoon) for my personal use case.
+Some basic features from ![harpoon](https://github.com/ThePrimeagen/harpoon) for my personal use case, written in vim9script.
 
 ![](https://github.com/ycm/harpy/blob/master/gallery/splash.png)
 
@@ -10,21 +10,26 @@ Unlike harpoon, harpy's menu is not a regular text buffer - as such, harpy does 
 
 Requires Vim 9+.
 
-Install with a plugin manager like ![vim-plug](https://github.com/junegunn/vim-plug):
+![vim-plug](https://github.com/junegunn/vim-plug):
 ```vim
 Plug 'ycm/harpy'
 ```
 
-Manual installation: Add `harpy.vim` to `.vim/plugin/`, or use the Vim8+ pack system, etc.
+Manual installation:
+```
+mkdir -p ~/.vim/pack/ycm/start && cd ~/.vim/pack/ycm/start
+git clone https://github.com/ycm/harpy.git
+vim -u NONE -c "helptags harpy/doc" -c q
+```
 
-⚠️ **NOTE**: `set autochdir` is **not recommended**, since harpy stores its filelist in the cwd. This also means you might want to `ignore` the filelist in your project. 
+Note: `set autochdir` is not recommended, since harpy stores its filelist in the cwd. This also means you might want to `ignore` the filelist in your project. 
 ```bash
 echo ".harpylist" >> .gitignore
 ```
 
-## Default usage
+## Basic usage
 
-See `:h harpy`
+See `:h harpy`.
 
 - Open the harpy menu with `:Harpy`
 - Add the current file to the harpy list with `:HarpyAdd`
@@ -50,46 +55,36 @@ nnoremap <silent> <leader>la :HarpyAdd<cr>
 
 **Default options**
 ```vim
-g:harpy_options = {
+g:harpy_opts = {
     file_name: '.harpylist',
     min_width: 40,
     pointer:    ' > ',
     no_pointer: '   ',
     keys_down:            ['j'],
     keys_up:              ['k'],
-    keys_reorder_down:    ['J'],
-    keys_reorder_up:      ['K'],
-    keys_open_file:       ['<Enter>', '<Space>'],
+    keys_move_down:       ['J'],
+    keys_move_up:         ['K'],
+    keys_open:            ['<Enter>', '<Space>'],
     keys_clear_not_found: ['D'],
     keys_remove_entry:    ['X'],
-    keys_split_on_top:    ['S'],
-    keys_split_on_bottom: ['s'],
-    keys_split_on_left:   ['V'],
-    keys_split_on_right:  ['v'],
+    keys_split_top:       ['S'],
+    keys_split_bottom:    ['s'],
+    keys_split_left:      ['V'],
+    keys_split_right:     ['v'],
     keys_toggle_help:     ['h']
 }
 ```
 
-To set custom options, add a global dictionary called `g:harpy_user_options` anywhere. 
+To set custom options, add a global dictionary called `g:harpy_user_opts` anywhere. 
 
-Vim9script:
 ```vim
-g:harpy_user_options = {
+vim9script
+g:harpy_user_opts = {
     keys_up: ['k', 'l'],
     pointer: '-->',
     no_pointer: ' * ',
     min_width: 70
 }
-```
-
-Legacy vimscript:
-```vim
-let g:harpy_user_options = {
-    \ 'keys_up': ['k', 'l'],
-    \ 'pointer': '-->',
-    \ 'no_pointer': ' * ',
-    \ 'min_width': 70
-    \ }
 ```
 
 **Colors**
@@ -112,6 +107,7 @@ hi default link HarpyMenuBorder   PMenu
 - [x] add option dict instead of global
 - [x] adding files from the command line (e.g. `:HarpyAdd path/to/file`)
 - [x] reordering menu items
+- [x] refactor and use autoload
 - [ ] support arrow and modifier keys
 - [ ] support multikey input (e.g. `dd` to delete)
 - [ ] optimizing the logic overall (harpy is naively implemented right now)

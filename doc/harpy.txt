@@ -3,12 +3,20 @@
 Author: Andrew C. Yang <https://github.com/ycm/>
 License: MIT License
 
-                 ______                                    
-                 ___  /_ ______ _________________ _____  __
-                 __  __ \_  __ `/__  ___/___  __ \__  / / /
-                 _  / / // /_/ / _  /    __  /_/ /_  /_/ / 
-                 /_/ /_/ \__,_/  /_/     _  .___/ _\__, /  
-                                         /_/      /____/   
+        .uef^"                                             ..         
+      :d88E                      .u    .    .d``          @L          
+      `888E             u      .d88B :@8c   @8Ne.   .u   9888i   .dL  
+       888E .z8k     us888u.  ="8888f8888r  %8888:u@88N  `Y888k:*888. 
+       888E~?888L .@88 "8888"   4888>'88"    `888I  888.   888E  888I 
+       888E  888E 9888  9888    4888> '       888I  888I   888E  888I 
+       888E  888E 9888  9888    4888>         888I  888I   888E  888I 
+       888E  888E 9888  9888   .d888L .+    uW888L  888'   888E  888I 
+       888E  888E 9888  9888   ^"8888*"    '*88888Nu88P   x888N><888' 
+      m888N= 888> "888*""888"     "Y"      ~ '88888F`      "88"  888  
+       `Y"   888   ^Y"   ^Y'                  888 ^              88F  
+            J88"                              *8E               98"   
+            @%                                '8>             ./"     
+          :"                                   "             ~`       
 
 
 ==============================================================================
@@ -44,7 +52,7 @@ actions are explained when you press `h`:
     - Show some help text with `h`
 
 Since the harpy menu is just a popup window, you can use the usual keys (i.e.
-`<Esc>`, `x`, and `<C-c>` to exit.
+`<Esc>`, `x`, and `<C-c>`) to exit.
 
 For convenience it might be advisable to define keymappings. Here are the ones
 I use:
@@ -74,30 +82,30 @@ CONFIGURATION                                            *harpy-configuration*
 
 These are the default options that harpy comes with:
 >
-    g:harpy_options = {
+    g:harpy_opts = {
         file_name: '.harpylist',
         min_width: 40,
         pointer:    ' > ',
         no_pointer: '   ',
         keys_down:            ['j'],
         keys_up:              ['k'],
-        keys_reorder_down:    ['J'],
-        keys_reorder_up:      ['K'],
-        keys_open_file:       ['<Enter>', '<Space>'],
+        keys_move_down:       ['J'],
+        keys_move_up:         ['K'],
+        keys_open:            ['<Enter>', '<Space>'],
         keys_clear_not_found: ['D'],
         keys_remove_entry:    ['X'],
-        keys_split_on_top:    ['S'],
-        keys_split_on_bottom: ['s'],
-        keys_split_on_left:   ['V'],
-        keys_split_on_right:  ['v'],
+        keys_split_top:       ['S'],
+        keys_split_bottom:    ['s'],
+        keys_split_left:      ['V'],
+        keys_split_right:     ['v'],
         keys_toggle_help:     ['h']
     }
 <
-To set custom options, add a global dictionary called `g:harpy_user_options` 
+To set custom options, add a global dictionary called `g:harpy_user_opts` 
 anywhere. 
 
 With vim9script: >
-    g:harpy_user_options = {
+    g:harpy_user_opts = {
         keys_up: ['k', 'l'],
         pointer: '-->',
         no_pointer: ' * ',
@@ -105,7 +113,7 @@ With vim9script: >
     }
 <
 With legacy vimscript: >
-    let g:harpy_user_options = {
+    let g:harpy_user_opts = {
         \ 'keys_up': ['k', 'l'],
         \ 'pointer': '-->',
         \ 'no_pointer': ' * ',
