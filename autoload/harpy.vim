@@ -1,6 +1,6 @@
 vim9script
 
-def harpy#Run()
+export def HarpyRun()
     harpy#LoadSettings()
     harpy#LoadFiles()
     g:harpy_info.menu_lines = harpy#CreateMenu()
@@ -19,7 +19,7 @@ def harpy#Run()
     })
 enddef
 
-def harpy#Add(file: string = '%')
+export def HarpyAdd(file: string = '%')
     harpy#LoadSettings()
     if !exists('g:harpy_info.valid_files')
         harpy#LoadFiles()

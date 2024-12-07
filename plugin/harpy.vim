@@ -46,5 +46,5 @@ g:harpy_options = {
     keys_toggle_help:     ['h']
 }
 
-command! Harpy harpy#Run()
-command! -nargs=? HarpyAdd harpy#Add(<f-args>)
+command! Harpy HarpyRun()
+command! -nargs=? HarpyAdd HarpyAdd(<f-args>)
