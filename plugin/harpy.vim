@@ -38,7 +38,7 @@ g:harpy_options = {
     keys_toggle_help:     ['h']
 }
 
-export def Harpy()
+def Harpy()
     HarpyLoadSettings()
     HarpyLoadFiles()
     g:harpy_info.menu_lines = HarpyCreateMenu()
@@ -56,7 +56,7 @@ export def Harpy()
     })
 enddef
 
-export def HarpyAdd(file: string = '%')
+def HarpyAdd(file: string = '%')
     HarpyLoadSettings()
     if !exists('g:harpy_info.valid_files')
         HarpyLoadFiles()
@@ -306,5 +306,3 @@ enddef
 
 command! Harpy Harpy()
 command! -nargs=? HarpyAdd HarpyAdd(<f-args>)
-
-# command! -nargs=1 ShimpToggle ShimpToggle(<f-args>)
