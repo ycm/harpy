@@ -9,6 +9,8 @@ if get(g:, 'loaded_harpy', false)
 endif
 g:loaded_harpy = true
 
+import autoload "../autoload/harpy.vim"
+
 hi default link HarpySelectedFile PMenuSel
 hi default link HarpyFileNotFound WarningMsg
 hi default link HarpyHelpText     Comment
