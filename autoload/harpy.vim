@@ -262,7 +262,7 @@ enddef
 
 
 def LoadUserOpts()
-    if get(g:, 'harpy_user_opts', false)
+    if exists('g:harpy_user_opts')
         for [opt, val] in g:harpy_user_opts->items()
             g:harpy_opts[opt] = val
         endfor
