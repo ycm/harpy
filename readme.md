@@ -26,6 +26,7 @@ echo ".harpylist" >> .gitignore
 
 - Open the harpy menu with `:Harpy`
 - Add the current file to the harpy list with `:HarpyAdd`
+- Add another file with `:HarpyAdd path/to/file`
 - Exit the menu with standard `popupwin` keys: `<Esc>`, `x`, `<C-c>`
 - Remove the selected file with `X`
 - Clear any deleted files with `D`

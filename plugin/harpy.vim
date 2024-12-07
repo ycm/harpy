@@ -56,24 +56,24 @@ export def Harpy()
     })
 enddef
 
-export def HarpyAdd()
+export def HarpyAdd(file: string = '%')
     HarpyLoadSettings()
     if !exists('g:harpy_info.valid_files')
         HarpyLoadFiles()
     endif
 
-    var newfile = expand('%')
+    var newfile = fnamemodify(expand(file), ":~:.")
     if !filereadable(newfile)
-        echom $'Invalid file for Harpy list: {newfile}'
+        echom $'[harpy] invalid file: {newfile}'
         return
     endif
 
     if g:harpy_info.valid_files->index(newfile) >= 0
-        echom $'{newfile} already in Harpy list.'
+        echom $'[harpy] {newfile} already in list.'
     else
         g:harpy_info.valid_files->add(newfile)
         HarpySave()
-        echom $'Added {newfile} to Harpy list.'
+        echom $'[harpy] added {newfile}.'
     endif
 enddef
 
@@ -82,7 +82,7 @@ def HarpyRemoveMenuItem()
         return
     endif
     remove(g:harpy_info.valid_files, g:harpy_info.sel_idx)
-    echom "Removed an item"
+    echom "[harpy] removed an item"
     HarpySave()
     HarpyLoadFiles()
     g:harpy_info.menu_lines = HarpyCreateMenu()
@@ -305,4 +305,6 @@ def HarpyLoadSettings()
 enddef
 
 command! Harpy Harpy()
-command! HarpyAdd HarpyAdd()
+command! -nargs=? HarpyAdd HarpyAdd(<f-args>)
+
+# command! -nargs=1 ShimpToggle ShimpToggle(<f-args>)
