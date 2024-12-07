@@ -97,6 +97,7 @@ Below are the highlight groups that you can customize, along with their defaults
 hi default link HarpySelectedFile PMenuSel
 hi default link HarpyFileNotFound WarningMsg
 hi default link HarpyHelpText     Comment
+hi default link HarpyMenuBg       PMenu
 hi default link HarpyMenuBorder   PMenu
 ```
 

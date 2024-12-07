@@ -7,6 +7,7 @@ vim9script
 hi default link HarpySelectedFile PMenuSel
 hi default link HarpyFileNotFound WarningMsg
 hi default link HarpyHelpText     Comment
+hi default link HarpyMenuBg       PMenu
 hi default link HarpyMenuBorder   PMenu
 
 if prop_type_get('harpy_prop_file_not_found') == {}
@@ -49,6 +50,7 @@ def Harpy()
         drag: 1,
         border: [],
         borderhighlight: ['HarpyMenuBorder'],
+        highlight: 'HarpyMenuBg',
         wrap: 0,
         padding: [1, 3, 1, 3], # U, R, D, L
         minwidth: g:harpy_options.min_width,
