@@ -13,9 +13,9 @@ export def HarpyRun()
         borderhighlight: ['HarpyMenuBorder'],
         highlight: 'HarpyMenuBg',
         padding: [1, 3, 1, 3], # U, R, D, L
-        filter: 'HarpyKeyHandler',
+        filter: HarpyKeyHandler,
         mapping: 0,
-        callback: 'HarpyHandleExit'
+        callback: HarpyHandleExit
     })
 enddef
 
@@ -38,7 +38,7 @@ export def HarpyAdd(file: string = '%')
     endif
 enddef
 
-def HarpyRemoveMenuItem()
+export def HarpyRemoveMenuItem()
     if g:harpy_info.valid_files->len() == 0
         return
     endif
@@ -50,7 +50,7 @@ def HarpyRemoveMenuItem()
     HarpyRefreshWindow()
 enddef
 
-def HarpyClearNotFound()
+export def HarpyClearNotFound()
     if g:harpy_info.invalid_files->len() == 0
         return
     endif
@@ -61,16 +61,13 @@ def HarpyClearNotFound()
     HarpyRefreshWindow()
 enddef
 
-def HarpyHandleExit(winid: number, option: number)
-    HarpySave()
-enddef
 
-def HarpySave()
+export def HarpySave()
     var lines_to_write = [g:harpy_info.sel_idx] + g:harpy_info.valid_files + g:harpy_info.invalid_files
     writefile(lines_to_write, g:harpy_options.file_name)
 enddef
 
-def HarpyLoadFiles()
+export def HarpyLoadFiles()
     if !filereadable(g:harpy_options.file_name)
         writefile([0], g:harpy_options.file_name)
     endif
@@ -92,7 +89,7 @@ def HarpyLoadFiles()
     g:harpy_info.sel_idx = sel_idx
 enddef
 
-def HarpySwitchFiles(i: number, j: number)
+export def HarpySwitchFiles(i: number, j: number)
     if g:harpy_info.valid_files->len() == 0
         return
     endif
@@ -103,7 +100,7 @@ def HarpySwitchFiles(i: number, j: number)
     HarpySave()
 enddef
 
-def HarpyRefreshWindow()
+export def HarpyRefreshWindow()
     if g:harpy_info.valid_files->len() == 0
         popup_settext(g:harpy_info.winid, g:harpy_info.menu_lines)
         return
@@ -124,7 +121,7 @@ def HarpyRefreshWindow()
     popup_settext(g:harpy_info.winid, g:harpy_info.menu_lines)
 enddef
 
-def HarpyMakeHelpText(): any
+export def HarpyMakeHelpText(): any
     var help_lines = [{}]
     help_lines->add(HarpyFormatString($'Harpylist filename: {g:harpy_options.file_name}', 'harpy_prop_help_text'))
     help_lines->add(HarpyFormatString($"Navigation: {join(g:harpy_options.keys_down + g:harpy_options.keys_up, '/')}", 'harpy_prop_help_text'))
@@ -137,7 +134,7 @@ def HarpyMakeHelpText(): any
     return help_lines
 enddef
 
-def HarpyToggleHelp()
+export def HarpyToggleHelp()
     if g:harpy_info.show_help == 1
         g:harpy_info.menu_lines->extend(HarpyMakeHelpText())
     else
@@ -145,7 +142,7 @@ def HarpyToggleHelp()
     endif
 enddef
 
-def HarpyOpenWindowHandler(winid: number, option: string): bool
+export def HarpyOpenWindowHandler(winid: number, option: string): bool
     if g:harpy_info.valid_files->len() == 0
         return false
     endif
@@ -188,7 +185,53 @@ def HarpyOpenWindowHandler(winid: number, option: string): bool
     return opened
 enddef
 
-def HarpyKeyHandler(winid: number, key: string): any
+export def HarpyFormatString(str: string, prop: string): any
+    return {text: str, props: [{col: 1, length: str->len(), type: prop}]}
+enddef
+
+export def HarpyCreateMenu(): any
+    var menu_lines = []
+    if g:harpy_info.valid_files->len() == 0
+        menu_lines += [{text: 'No valid files found!'}, {}]
+    endif
+
+    for [i, file] in items(g:harpy_info.valid_files)
+        if i == g:harpy_info.sel_idx
+            menu_lines->add(HarpyFormatString($'{g:harpy_options.pointer}{file}', 'harpy_prop_selected_file'))
+        else
+            menu_lines->add({text: $'{g:harpy_options.no_pointer}{file}'})
+        endif
+    endfor
+
+    if g:harpy_info.invalid_files->len() > 0
+        if g:harpy_info.valid_files->len() > 0
+            menu_lines->add({})
+        endif
+        menu_lines->add(HarpyFormatString('Files not found:', 'harpy_prop_file_not_found'))
+        for badfile in g:harpy_info.invalid_files
+            menu_lines->add(HarpyFormatString($'- {badfile}', 'harpy_prop_file_not_found'))
+        endfor
+    endif
+
+    menu_lines->add({})
+    menu_lines->add(HarpyFormatString($"Toggle help: {join(g:harpy_options.keys_toggle_help, '/')}", 'harpy_prop_help_text'))
+
+    if g:harpy_info.show_help
+        menu_lines->extend(HarpyMakeHelpText())
+    endif
+
+    return menu_lines
+enddef
+
+export def HarpyLoadSettings()
+    if exists('g:harpy_user_options')
+        for [opt, val] in g:harpy_user_options->items()
+            g:harpy_options[opt] = val
+        endfor
+    endif
+enddef
+
+export def HarpyKeyHandler(winid: number, key: string): any
     var k_ = (key == ' ') ? '<Space>' : key
     k_ = (key == '') ? '<Enter>' : key
     if index(g:harpy_options.keys_split_on_right, k_) >= 0
@@ -234,48 +277,7 @@ def HarpyKeyHandler(winid: number, key: string): any
     return true
 enddef
 
-def HarpyFormatString(str: string, prop: string): any
-    return {text: str, props: [{col: 1, length: str->len(), type: prop}]}
+export def HarpyHandleExit(winid: number, option: number)
+    HarpySave()
 enddef
 
-def HarpyCreateMenu(): any
-    var menu_lines = []
-    if g:harpy_info.valid_files->len() == 0
-        menu_lines += [{text: 'No valid files found!'}, {}]
-    endif
-
-    for [i, file] in items(g:harpy_info.valid_files)
-        if i == g:harpy_info.sel_idx
-            menu_lines->add(HarpyFormatString($'{g:harpy_options.pointer}{file}', 'harpy_prop_selected_file'))
-        else
-            menu_lines->add({text: $'{g:harpy_options.no_pointer}{file}'})
-        endif
-    endfor
-
-    if g:harpy_info.invalid_files->len() > 0
-        if g:harpy_info.valid_files->len() > 0
-            menu_lines->add({})
-        endif
-        menu_lines->add(HarpyFormatString('Files not found:', 'harpy_prop_file_not_found'))
-        for badfile in g:harpy_info.invalid_files
-            menu_lines->add(HarpyFormatString($'- {badfile}', 'harpy_prop_file_not_found'))
-        endfor
-    endif
-
-    menu_lines->add({})
-    menu_lines->add(HarpyFormatString($"Toggle help: {join(g:harpy_options.keys_toggle_help, '/')}", 'harpy_prop_help_text'))
-
-    if g:harpy_info.show_help
-        menu_lines->extend(HarpyMakeHelpText())
-    endif
-
-    return menu_lines
-enddef
-
-def HarpyLoadSettings()
-    if exists('g:harpy_user_options')
-        for [opt, val] in g:harpy_user_options->items()
-            g:harpy_options[opt] = val
-        endfor
-    endif
-enddef
