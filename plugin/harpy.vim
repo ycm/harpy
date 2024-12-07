@@ -24,10 +24,12 @@ g:harpy_info = {show_help: 0}
 g:harpy_options = {
     file_name: '.harpylist',
     min_width: 40,
-    pointer:    '> ',
-    no_pointer: '  ',
+    pointer:    ' > ',
+    no_pointer: '   ',
     keys_down:            ['j'],
     keys_up:              ['k'],
+    keys_reorder_down:    ['J'],
+    keys_reorder_up:      ['K'],
     keys_open_file:       ['<Enter>', '<Space>'],
     keys_clear_not_found: ['D'],
     keys_remove_entry:    ['X'],
@@ -134,6 +136,17 @@ def HarpyLoadFiles()
     g:harpy_info.sel_idx = sel_idx
 enddef
 
+def HarpySwitchFiles(i: number, j: number)
+    if g:harpy_info.valid_files->len() == 0
+        return
+    endif
+    [g:harpy_info.menu_lines[i], g:harpy_info.menu_lines[j]] =
+        [g:harpy_info.menu_lines[j], g:harpy_info.menu_lines[i]]
+    [g:harpy_info.valid_files[i], g:harpy_info.valid_files[j]] =
+        [g:harpy_info.valid_files[j], g:harpy_info.valid_files[i]]
+    HarpySave()
+enddef
+
 def HarpyRefreshWindow()
     if g:harpy_info.valid_files->len() == 0
         popup_settext(g:harpy_info.winid, g:harpy_info.menu_lines)
@@ -159,6 +172,7 @@ def HarpyMakeHelpText(): any
     var help_lines = [{}]
     help_lines->add(HarpyFormatString($'Harpylist filename: {g:harpy_options.file_name}', 'harpy_prop_help_text'))
     help_lines->add(HarpyFormatString($"Navigation: {join(g:harpy_options.keys_down + g:harpy_options.keys_up, '/')}", 'harpy_prop_help_text'))
+    help_lines->add(HarpyFormatString($"Reorder: {join(g:harpy_options.keys_reorder_down + g:harpy_options.keys_reorder_up, '/')}", 'harpy_prop_help_text'))
     help_lines->add(HarpyFormatString($"Open file: {join(g:harpy_options.keys_open_file, '/')}", 'harpy_prop_help_text'))
     help_lines->add(HarpyFormatString($"Open in split on left (right): {join(g:harpy_options.keys_split_on_left, '/')} ({join(g:harpy_options.keys_split_on_right, '/')})", 'harpy_prop_help_text'))
     help_lines->add(HarpyFormatString($"Open in split on top (bottom): {join(g:harpy_options.keys_split_on_top, '/')} ({join(g:harpy_options.keys_split_on_bottom, '/')})", 'harpy_prop_help_text'))
@@ -241,6 +255,16 @@ def HarpyKeyHandler(winid: number, key: string): any
         HarpyRefreshWindow()
     elseif index(g:harpy_options.keys_up, k_) >= 0
         g:harpy_info.sel_idx = max([g:harpy_info.sel_idx - 1, 0])
+        HarpyRefreshWindow()
+    elseif index(g:harpy_options.keys_reorder_down, k_) >= 0
+        var new_idx = min([g:harpy_info.sel_idx + 1, g:harpy_info.valid_files->len() - 1])
+        HarpySwitchFiles(g:harpy_info.sel_idx, new_idx)
+        g:harpy_info.sel_idx = new_idx
+        HarpyRefreshWindow()
+    elseif index(g:harpy_options.keys_reorder_up, k_) >= 0
+        var new_idx = max([g:harpy_info.sel_idx - 1, 0])
+        HarpySwitchFiles(g:harpy_info.sel_idx, new_idx)
+        g:harpy_info.sel_idx = new_idx
         HarpyRefreshWindow()
     elseif index(g:harpy_options.keys_clear_not_found, k_) >= 0
         HarpyClearNotFound()

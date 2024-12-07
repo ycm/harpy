@@ -31,6 +31,7 @@ echo ".harpylist" >> .gitignore
 - Remove the selected file with `X`
 - Clear any deleted files with `D`
 - Navigate the filelist with `j` and `k`
+- Reorder files with `J` and `K`
 - Open the selected file with `<Enter>` or `<Space>`
 - Open the selected file as a vertical split with `V` or `v`
 - Open the selected file as a horizontal split with `S` or `s`
@@ -50,10 +51,12 @@ nnoremap <silent> <leader>la :HarpyAdd<cr>
 g:harpy_options = {
     file_name: '.harpylist',
     min_width: 40,
-    pointer:    '> ',
-    no_pointer: '  ',
+    pointer:    ' > ',
+    no_pointer: '   ',
     keys_down:            ['j'],
     keys_up:              ['k'],
+    keys_reorder_down:    ['J'],
+    keys_reorder_up:      ['K'],
     keys_open_file:       ['<Enter>', '<Space>'],
     keys_clear_not_found: ['D'],
     keys_remove_entry:    ['X'],
@@ -70,7 +73,7 @@ To set custom options, add a global dictionary called `g:harpy_user_options` any
 Vim9script:
 ```vim
 g:harpy_user_options = {
-    keys_up: ['k', 'K'],
+    keys_up: ['k', 'l'],
     pointer: '-->',
     no_pointer: ' * ',
     min_width: 70
@@ -80,7 +83,7 @@ g:harpy_user_options = {
 Legacy vimscript:
 ```vim
 let g:harpy_user_options = {
-    \ 'keys_up': ['k', 'K'],
+    \ 'keys_up': ['k', 'l'],
     \ 'pointer': '-->',
     \ 'no_pointer': ' * ',
     \ 'min_width': 70
@@ -104,8 +107,8 @@ hi default link HarpyMenuBorder   PMenu
 - [x] structure as plugin
 - [x] test on some other project dirs
 - [x] add option dict instead of global
-- [ ] adding files from the command line (e.g. `:HarpyAdd path/to/file`)
-- [ ] reordering menu items
+- [x] adding files from the command line (e.g. `:HarpyAdd path/to/file`)
+- [x] reordering menu items
 - [ ] support arrow and modifier keys
 - [ ] support multikey input (e.g. `dd` to delete)
 - [ ] optimizing the logic overall (harpy is naively implemented right now)
