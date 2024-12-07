@@ -1,0 +1,126 @@
+*harpy.txt* harpoon-like features without neovim.
+
+Author: Andrew C. Yang <https://github.com/ycm/>
+License: MIT License
+
+                 ______                                    
+                 ___  /_ ______ _________________ _____  __
+                 __  __ \_  __ `/__  ___/___  __ \__  / / /
+                 _  / / // /_/ / _  /    __  /_/ /_  /_/ / 
+                 /_/ /_/ \__,_/  /_/     _  .___/ _\__, /  
+                                         /_/      /____/   
+
+
+==============================================================================
+CONTENTS                                                      *harpy-contents*
+
+          1. Usage..........................|harpy-contents|
+          2. Differences from harpoon.......|harpy-differences|
+          3. Configuration..................|harpy-configuration|
+
+==============================================================================
+USAGE                                                            *harpy-usage*
+                                                              *Harpy* *HarpyAdd*
+Harpy provides the following commands:
+>
+        :Harpy
+        :HarpyAdd {file}
+<
+`:Harpy` opens the harpy menu. `:HarpyAdd` with no arguments adds the current
+file to the harpy list. `:HarpyAdd {file}` will add `{file}` to the list.
+
+Note that only readable files can be added.
+
+Inside the harpy menu you can press `h` to show/hide a list of actions. These
+actions are explained when you press `h`:
+
+    - Remove the selected file with `X`
+    - Clear any deleted files with `D`
+    - Navigate the filelist with `j` and `k`
+    - Reorder files with `J` and `K`
+    - Open the selected file with `<Enter>` or `<Space>`
+    - Open the selected file as a vertical split with `V` or `v`
+    - Open the selected file as a horizontal split with `S` or `s`
+    - Show some help text with `h`
+
+Since the harpy menu is just a popup window, you can use the usual keys (i.e.
+`<Esc>`, `x`, and `<C-c>` to exit.
+
+For convenience it might be advisable to define keymappings. Here are the ones
+I use:
+>
+    nnoremap <silent> <leader>ll :Harpy<cr>
+    nnoremap <silent> <leader>la :HarpyAdd<cr>
+<
+
+==============================================================================
+DIFFERENCES FROM HARPOON                                   *harpy-differences*
+
+Unlike harpoon, harpy's menu is not a regular text buffer - as such, harpy 
+does not permit text-editing commands like inserting text, `dd`, etc. To
+hopefully offset this limitation, some basic menu management functionality is
+offered with customizable keys. On the other hand, this also means no need to
+`:w` to save the menu, and the menu can remember the cursor position, show 
+some info, etc.
+
+Also, harpy works by creating and continuously updating a file called
+`.harpylist` in your current working directory. Each time you modify the menu
+(adding, removing, reordering, move the cursorline, etc.), harpy will update
+this file. As such you should avoid setting `autochdir`.
+
+
+==============================================================================
+CONFIGURATION                                            *harpy-configuration*
+
+These are the default options that harpy comes with:
+>
+    g:harpy_options = {
+        file_name: '.harpylist',
+        min_width: 40,
+        pointer:    ' > ',
+        no_pointer: '   ',
+        keys_down:            ['j'],
+        keys_up:              ['k'],
+        keys_reorder_down:    ['J'],
+        keys_reorder_up:      ['K'],
+        keys_open_file:       ['<Enter>', '<Space>'],
+        keys_clear_not_found: ['D'],
+        keys_remove_entry:    ['X'],
+        keys_split_on_top:    ['S'],
+        keys_split_on_bottom: ['s'],
+        keys_split_on_left:   ['V'],
+        keys_split_on_right:  ['v'],
+        keys_toggle_help:     ['h']
+    }
+<
+To set custom options, add a global dictionary called `g:harpy_user_options` 
+anywhere. 
+
+With vim9script: >
+    g:harpy_user_options = {
+        keys_up: ['k', 'l'],
+        pointer: '-->',
+        no_pointer: ' * ',
+        min_width: 70
+    }
+<
+With legacy vimscript: >
+    let g:harpy_user_options = {
+        \ 'keys_up': ['k', 'l'],
+        \ 'pointer': '-->',
+        \ 'no_pointer': ' * ',
+        \ 'min_width': 70
+        \ }
+<
+Harpy is not very optimized and merges these two dictionaries every time you
+open the menu, so you can define or modify the your custom options anytime.
+
+                                                                *harpy-colors*
+Harpy also comes with these highlight groups: >
+    hi default link HarpySelectedFile PMenuSel
+    hi default link HarpyFileNotFound WarningMsg
+    hi default link HarpyHelpText     Comment
+    hi default link HarpyMenuBg       PMenu
+    hi default link HarpyMenuBorder   PMenu<
+
+vim:tw=78:sw=8:ts=8:ft=help:norl:noet

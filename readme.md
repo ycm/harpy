@@ -24,6 +24,8 @@ echo ".harpylist" >> .gitignore
 
 ## Default usage
 
+See `:h harpy`
+
 - Open the harpy menu with `:Harpy`
 - Add the current file to the harpy list with `:HarpyAdd`
 - Add another file with `:HarpyAdd path/to/file`
@@ -113,5 +115,5 @@ hi default link HarpyMenuBorder   PMenu
 - [ ] support arrow and modifier keys
 - [ ] support multikey input (e.g. `dd` to delete)
 - [ ] optimizing the logic overall (harpy is naively implemented right now)
-- [ ] write docs.txt
+- [x] write help
 - [ ] undo delete?
