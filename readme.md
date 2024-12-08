@@ -2,7 +2,9 @@
 
 Some basic features from ![harpoon](https://github.com/ThePrimeagen/harpoon) for my personal use case, written in vim9script.
 
-![](https://github.com/ycm/harpy/blob/master/gallery/splash.png)
+![demo](https://github.com/ycm/harpy/blob/master/gallery/demo.gif)
+
+(gif made with [asciinema](https://asciinema.org/))
 
 Unlike harpoon, harpy's menu is not a regular text buffer - as such, harpy does not permit text-editing commands like inserting text, `dd`, etc. To hopefully offset this limitation, some basic menu management functionality is offered with customizable keys. On the other hand, this also means no need to `:w` to save the menu, and the menu can 'remember' the cursor position, show some more info, etc.
 
@@ -26,23 +28,6 @@ Note: `set autochdir` is not recommended, since harpy stores its filelist in the
 ```bash
 echo ".harpylist" >> .gitignore
 ```
-
-## Basic usage
-
-See `:h harpy`.
-
-- Open the harpy menu with `:Harpy`
-- Add the current file to the harpy list with `:HarpyAdd`
-- Add another file with `:HarpyAdd path/to/file`
-- Exit the menu with standard `popupwin` keys: `<Esc>`, `x`, `<C-c>`
-- Remove the selected file with `X`
-- Clear any deleted files with `D`
-- Navigate the filelist with `j` and `k`
-- Reorder files with `J` and `K`
-- Open the selected file with `<Enter>` or `<Space>`
-- Open the selected file as a vertical split with `V` or `v`
-- Open the selected file as a horizontal split with `S` or `s`
-- Show some help text with `h`
 
 ## Configs
 
@@ -75,28 +60,33 @@ g:harpy_opts = {
 }
 ```
 
-To set custom options, add a global dictionary called `g:harpy_user_opts` anywhere. 
-
+To set custom options, add a global dictionary called `g:harpy_user_opts`. This
+dictionary is loaded when you first run `:Harpy` or `:HarpyAdd`. If you modify
+these configs after using harpy, you should restart Vim for the changes to take
+effect.
 ```vim
 vim9script
 g:harpy_user_opts = {
     keys_up: ['k', 'l'],
-    pointer: '-->',
-    no_pointer: ' * ',
+    pointer: '>',
+    no_pointer: ' ',
     min_width: 70
 }
 ```
 
 **Colors**
 
-Below are the highlight groups that you can customize, along with their defaults.
-```vim
-hi default link HarpySelectedFile PMenuSel
-hi default link HarpyFileNotFound WarningMsg
-hi default link HarpyHelpText     Comment
-hi default link HarpyMenuBg       PMenu
-hi default link HarpyMenuBorder   PMenu
-```
+Harpy also comes with these highlight links: >
+    HarpyEntry             -> Normal
+    HarpyEntryFile         -> Identifier
+    HarpyEntrySelected     -> Normal
+    HarpyEntrySelectedFile -> Identifier
+    HarpyFileNotFound      -> Removed
+    HarpyHelpText          -> Comment
+    HarpyMenuBg            -> PMenu
+    HarpyMenuBorder        -> PMenu<
+
+You can play around with these as you would any other highlight group.
 
 ## TODOs
 - [x] add ability to clear not-found list

@@ -12,4 +12,4 @@ g:loaded_harpy = true
 import autoload "../autoload/harpy.vim"
 
 command! Harpy harpy.Run()
-command! -nargs=? HarpyAdd harpy.Add(<f-args>)
+command! -nargs=? -complete=file HarpyAdd harpy.Add(<f-args>)
