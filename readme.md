@@ -1,6 +1,6 @@
-# harpy
+<h1 align="center">harpy</h1>
 
-Some basic features from ![harpoon](https://github.com/ThePrimeagen/harpoon) for my personal use case, written in vim9script.
+<p align="center">A small set of <a href="https://github.com/ThePrimeagen/harpoon">harpoon</a>-like features for my personal use case.</p>
 
 ![demo](https://github.com/ycm/harpy/blob/master/gallery/demo.gif)
 
