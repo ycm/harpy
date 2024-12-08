@@ -90,7 +90,7 @@ g:harpy_user_opts = {
 **Colors**
 
 Below are the highlight groups that you can customize, along with their defaults.
-```
+```vim
 hi default link HarpySelectedFile PMenuSel
 hi default link HarpyFileNotFound WarningMsg
 hi default link HarpyHelpText     Comment

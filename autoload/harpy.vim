@@ -2,7 +2,9 @@ vim9script
 
 
 export def Run()
-    LoadUserOpts()
+    if !exists('g:harpy_info')
+        Init()
+    endif
     LoadFiles()
     g:harpy_info.menu_ = CreateMenu()
     g:harpy_info.winid = popup_create(g:harpy_info.menu_, {
@@ -22,7 +24,9 @@ enddef
 
 
 export def Add(file: string = '%')
-    LoadUserOpts()
+    if !exists('g:harpy_info')
+        Init()
+    endif
     if !exists('g:harpy_info.valid')
         LoadFiles()
     endif
@@ -90,8 +94,8 @@ def LoadFiles()
     endfor
     g:harpy_info.valid = found
     g:harpy_info.invalid = not_found
-    sel_idx = max([sel_idx, 0])
-    sel_idx = min([sel_idx, g:harpy_info.valid->len() - 1])
+    sel_idx = [sel_idx, 0]->max()
+    sel_idx = [sel_idx, g:harpy_info.valid->len() - 1]->min()
     g:harpy_info.sel_idx = sel_idx
 enddef
 
@@ -125,51 +129,110 @@ def Refresh()
     var curr_text = g:harpy_info.menu_[curr_].text->substitute(
         $'^{g:harpy_opts.no_pointer}', g:harpy_opts.pointer, 'g')
 
-    g:harpy_info.menu_[prev_] = {text: prev_text}
-    g:harpy_info.menu_[next_] = {text: next_text}
-    g:harpy_info.menu_[curr_] = FormatString(curr_text, 'harpy_prop_selected')
+    g:harpy_info.menu_[prev_] = FormatLine(prev_text, 'entry')
+    g:harpy_info.menu_[next_] = FormatLine(next_text, 'entry')
+    g:harpy_info.menu_[curr_] = FormatLine(curr_text, 'selected entry')
 
     popup_settext(g:harpy_info.winid, g:harpy_info.menu_)
 enddef
 
+def FormatLine(text: string, style: string): any
+    if style == 'help'
+        return {
+            text: text,
+            props: [{col: 1, length: text->len(), type: 'harpy_prop_HelpText'}]
+        } 
+    endif
+    if style == 'not found'
+        return {
+            text: text,
+            props: [{col: 1, length: text->len(), type: 'harpy_prop_FileNotFound'}]
+        } 
+    endif
+    var head = fnamemodify(text, ':h')
+    var headlen = head == '.' ? 0 : head->len()
+    var path_prop = style == 'selected entry' ? 'harpy_prop_EntrySelected' : 'harpy_prop_Entry'
+    var stem_prop = style == 'entry' ? 'harpy_prop_EntrySelectedHead' : 'harpy_prop_EntryHead'
+    return {
+        text: text,
+        props: [
+            {col: 1, length: headlen + 1, type: path_prop},
+            {col: headlen + 1, length: text->len() - headlen, type: stem_prop}
+        ]
+    }
+enddef
 
-def FormatHelp(): any
-    var help_lines = [{}]
-    help_lines->add(FormatString($'Harpylist filename: ' .. 
-        g:harpy_opts.file_name,
-        'harpy_prop_help'))
-    help_lines->add(FormatString('Navigation: ' ..
-        join(g:harpy_opts.keys_down + g:harpy_opts.keys_up, '/'),
-        'harpy_prop_help'))
-    help_lines->add(FormatString('Reorder: ' ..
-        join(g:harpy_opts.keys_move_down + g:harpy_opts.keys_move_up, '/'),
-        'harpy_prop_help'))
-    help_lines->add(FormatString('Open file: ' ..
-        join(g:harpy_opts.keys_open, '/'), 
-        'harpy_prop_help'))
-    help_lines->add(FormatString('Open in split on left (right): ' ..
-        join(g:harpy_opts.keys_split_left, '/') .. 
-        $" ({join(g:harpy_opts.keys_split_right, '/')})",
-        'harpy_prop_help'))
-    help_lines->add(FormatString('Open in split on top (bottom): ' ..
-        join(g:harpy_opts.keys_split_top, '/') ..
-        $" ({join(g:harpy_opts.keys_split_bottom, '/')})",
-        'harpy_prop_help'))
-    help_lines->add(FormatString('Remove file from list: ' ..
-        join(g:harpy_opts.keys_remove_entry, '/'),
-        'harpy_prop_help'))
-    help_lines->add(FormatString('Clear missing files: ' ..
-        join(g:harpy_opts.keys_clear_not_found, '/'),
-        'harpy_prop_help'))
-    return help_lines
+def Init()
+    g:harpy_info = {show_help: 0}
+    g:harpy_opts = {
+        file_name: '.harpylist',
+        min_width: 40,
+        pointer:    ' > ',
+        no_pointer: '   ',
+        keys_down:            ['j'],
+        keys_up:              ['k'],
+        keys_move_down:       ['J'],
+        keys_move_up:         ['K'],
+        keys_open:            ['<Enter>', '<Space>'],
+        keys_clear_not_found: ['D'],
+        keys_remove_entry:    ['X'],
+        keys_split_top:       ['S'],
+        keys_split_bottom:    ['s'],
+        keys_split_left:      ['V'],
+        keys_split_right:     ['v'],
+        keys_toggle_help:     ['h']
+    }
+    if exists('g:harpy_user_opts')
+        for [opt, val] in g:harpy_user_opts->items()
+            g:harpy_opts[opt] = val
+        endfor
+    endif
+    var textcolors = [
+        ['Entry', 'Normal'],
+        ['EntryHead', 'Normal'],
+        ['EntrySelected', 'Normal'],
+        ['EntrySelectedHead', 'Normal'],
+        ['FileNotFound', 'WarningMsg'],
+        ['HelpText', 'Comment'],
+        ['MenuBg', 'PMenu'],
+        ['MenuBorder', 'PMenu']
+    ]
+
+    for [group, link] in textcolors
+        var hgroup = $'Harpy{group}'
+        var prop = $'harpy_prop_{group}'
+        execute $'hi default link {hgroup} {link}'
+        if prop_type_get(prop) == {}
+            prop_type_add(prop, {highlight: hgroup})
+        endif
+    endfor
+
+    g:harpy_info.help_lines = [{},
+        FormatLine($'Harpylist filename: ' .. g:harpy_opts.file_name, 'help'),
+        FormatLine('Navigation: ' ..
+            join(g:harpy_opts.keys_down + g:harpy_opts.keys_up, '/'), 'help'),
+        FormatLine('Reorder: ' ..
+            join(g:harpy_opts.keys_move_down + g:harpy_opts.keys_move_up, '/'),
+            'help'),
+        FormatLine('Open file: ' .. join(g:harpy_opts.keys_open, '/'), 'help'),
+        FormatLine('Open in split on left (right): ' ..
+            join(g:harpy_opts.keys_split_left, '/') .. 
+            $" ({join(g:harpy_opts.keys_split_right, '/')})", 'help'),
+        FormatLine('Open in split on top (bottom): ' ..
+            join(g:harpy_opts.keys_split_top, '/') ..
+            $" ({join(g:harpy_opts.keys_split_bottom, '/')})", 'help'),
+        FormatLine('Remove file from list: ' ..
+            join(g:harpy_opts.keys_remove_entry, '/'), 'help'),
+        FormatLine('Clear missing files: ' ..
+            join(g:harpy_opts.keys_clear_not_found, '/'), 'help')]
 enddef
 
 
 def ToggleHelp()
     if g:harpy_info.show_help == 1
-        g:harpy_info.menu_->extend(FormatHelp())
+        g:harpy_info.menu_->extend(g:harpy_info.help_lines)
     else
-        g:harpy_info.menu_ = g:harpy_info.menu_[: -(FormatHelp()->len() + 1)]
+        g:harpy_info.menu_ = g:harpy_info.menu_[: -(g:harpy_info.help_lines->len() + 1)]
     endif
 enddef
 
@@ -222,7 +285,6 @@ def FormatString(str: string, prop: string): any
     return {text: str, props: [{col: 1, length: str->len(), type: prop}]}
 enddef
 
-
 def CreateMenu(): any
     var menu_ = []
     if g:harpy_info.valid->len() == 0
@@ -231,10 +293,9 @@ def CreateMenu(): any
 
     for [i, file] in items(g:harpy_info.valid)
         if i == g:harpy_info.sel_idx
-            menu_->add(FormatString($'{g:harpy_opts.pointer}{file}',
-                'harpy_prop_selected'))
+            menu_->add(FormatLine($'{g:harpy_opts.pointer}{file}', 'selected entry'))
         else
-            menu_->add({text: $'{g:harpy_opts.no_pointer}{file}'})
+            menu_->add(FormatLine($'{g:harpy_opts.no_pointer}{file}', 'entry'))
         endif
     endfor
 
@@ -242,31 +303,22 @@ def CreateMenu(): any
         if g:harpy_info.valid->len() > 0
             menu_->add({})
         endif
-        menu_->add(FormatString('Files not found:', 'harpy_prop_not_found'))
+        menu_->add(FormatLine('Files not found:', 'not found'))
         for badfile in g:harpy_info.invalid
-            menu_->add(FormatString($'- {badfile}', '_prop_file_not_found'))
+            menu_->add(FormatLine($'- {badfile}', 'not found'))
         endfor
     endif
 
     menu_->add({})
-    menu_->add(FormatString(
+    menu_->add(FormatLine(
         $"Toggle help: {join(g:harpy_opts.keys_toggle_help, '/')}",
-        'harpy_prop_help'))
+        'help'))
 
     if g:harpy_info.show_help
-        menu_->extend(FormatHelp())
+        menu_->extend(g:harpy_info.help_lines)
     endif
 
     return menu_
-enddef
-
-
-def LoadUserOpts()
-    if exists('g:harpy_user_opts')
-        for [opt, val] in g:harpy_user_opts->items()
-            g:harpy_opts[opt] = val
-        endfor
-    endif
 enddef
 
 
@@ -286,20 +338,20 @@ def HandleInput(winid: number, key: string): any
         execute $'edit {g:harpy_info.valid[g:harpy_info.sel_idx]}'
         return popup_filter_menu(winid, '')
     elseif index(g:harpy_opts.keys_down, k_) >= 0
-        g:harpy_info.sel_idx = min([g:harpy_info.sel_idx + 1,
-            g:harpy_info.valid->len() - 1])
+        g:harpy_info.sel_idx = [g:harpy_info.sel_idx + 1,
+            g:harpy_info.valid->len() - 1]->min()
         Refresh()
     elseif index(g:harpy_opts.keys_up, k_) >= 0
-        g:harpy_info.sel_idx = max([g:harpy_info.sel_idx - 1, 0])
+        g:harpy_info.sel_idx = [g:harpy_info.sel_idx - 1, 0]->max()
         Refresh()
     elseif index(g:harpy_opts.keys_move_down, k_) >= 0
-        var new_idx = min([g:harpy_info.sel_idx + 1,
-            g:harpy_info.valid->len() - 1])
+        var new_idx = [g:harpy_info.sel_idx + 1,
+            g:harpy_info.valid->len() - 1]->min()
         Switch(g:harpy_info.sel_idx, new_idx)
         g:harpy_info.sel_idx = new_idx
         Refresh()
     elseif index(g:harpy_opts.keys_move_up, k_) >= 0
-        var new_idx = max([g:harpy_info.sel_idx - 1, 0])
+        var new_idx = [g:harpy_info.sel_idx - 1, 0]->max()
         Switch(g:harpy_info.sel_idx, new_idx)
         g:harpy_info.sel_idx = new_idx
         Refresh()
