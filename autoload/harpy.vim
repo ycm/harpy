@@ -11,11 +11,11 @@ export def Run()
         minwidth: g:harpy_opts.min_width,
         title: ' harpy ',
         drag: true,
-        resize: true,
         border: [],
+        borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
         borderhighlight: ['HarpyMenuBorder'],
         highlight: 'HarpyMenuBg',
-        padding: [1, 3, 1, 3], # U, R, D, L
+        padding: [1, 3, 1, 3],
         filter: HandleInput,
         mapping: 0,
         callback: HandleExit
@@ -152,12 +152,12 @@ def FormatLine(text: string, style: string): any
     var head = fnamemodify(text, ':h')
     var headlen = head == '.' ? 0 : head->len()
     var path_prop = style == 'selected entry' ? 'harpy_prop_EntrySelected' : 'harpy_prop_Entry'
-    var stem_prop = style == 'entry' ? 'harpy_prop_EntrySelectedHead' : 'harpy_prop_EntryHead'
+    var file_prop = style == 'selected entry' ? 'harpy_prop_EntrySelectedFile' : 'harpy_prop_EntryFile'
     return {
         text: text,
         props: [
             {col: 1, length: headlen + 1, type: path_prop},
-            {col: headlen + 1, length: text->len() - headlen, type: stem_prop}
+            {col: headlen + 2, length: text->len() - headlen - 1, type: file_prop}
         ]
     }
 enddef
@@ -189,10 +189,10 @@ def Init()
     endif
     var textcolors = [
         ['Entry', 'Normal'],
-        ['EntryHead', 'Normal'],
+        ['EntryFile', 'Identifier'],
         ['EntrySelected', 'Normal'],
-        ['EntrySelectedHead', 'Normal'],
-        ['FileNotFound', 'WarningMsg'],
+        ['EntrySelectedFile', 'Identifier'],
+        ['FileNotFound', 'Removed'],
         ['HelpText', 'Comment'],
         ['MenuBg', 'PMenu'],
         ['MenuBorder', 'PMenu']

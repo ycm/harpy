@@ -101,34 +101,38 @@ These are the default options that harpy comes with:
         keys_toggle_help:     ['h']
     }
 <
-To set custom options, add a global dictionary called `g:harpy_user_opts` 
-anywhere. 
+To set custom options, add a global dictionary called `g:harpy_user_opts`. This
+dictionary is loaded when you first run `:Harpy` or `:HarpyAdd`. If you modify
+these configs after using harpy, you should restart Vim for the changes to take
+effect.
 
 With vim9script: >
     g:harpy_user_opts = {
         keys_up: ['k', 'l'],
-        pointer: '-->',
-        no_pointer: ' * ',
+        pointer: '>',
+        no_pointer: ' ',
         min_width: 70
     }
 <
 With legacy vimscript: >
     let g:harpy_user_opts = {
         \ 'keys_up': ['k', 'l'],
-        \ 'pointer': '-->',
-        \ 'no_pointer': ' * ',
+        \ 'pointer': '>',
+        \ 'no_pointer': ' ',
         \ 'min_width': 70
         \ }
 <
-Harpy is not very optimized and merges these two dictionaries every time you
-open the menu, so you can define or modify the your custom options anytime.
-
                                                                 *harpy-colors*
-Harpy also comes with these highlight groups: >
-    hi default link HarpySelectedFile PMenuSel
-    hi default link HarpyFileNotFound WarningMsg
-    hi default link HarpyHelpText     Comment
-    hi default link HarpyMenuBg       PMenu
-    hi default link HarpyMenuBorder   PMenu<
+Harpy also comes with these highlight links: >
+    HarpyEntry             -> Normal
+    HarpyEntryFile         -> Identifier
+    HarpyEntrySelected     -> Normal
+    HarpyEntrySelectedFile -> Identifier
+    HarpyFileNotFound      -> Removed
+    HarpyHelpText          -> Comment
+    HarpyMenuBg            -> PMenu
+    HarpyMenuBorder        -> PMenu<
+
+You can play around with these as you would any other highlight group.
 
 vim:tw=78:sw=8:ts=8:ft=help:norl:noet
