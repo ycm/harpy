@@ -76,30 +76,16 @@ g:harpy_user_opts = {
 
 **Colors**
 
-Harpy also comes with these highlight links: >
-    HarpyEntry             -> Normal
-    HarpyEntryFile         -> Identifier
-    HarpyEntrySelected     -> Normal
-    HarpyEntrySelectedFile -> Identifier
-    HarpyFileNotFound      -> Removed
-    HarpyHelpText          -> Comment
-    HarpyMenuBg            -> PMenu
-    HarpyMenuBorder        -> PMenu<
+Harpy also comes with these highlight links:
+```vim
+HarpyEntry             -> Normal
+HarpyEntryFile         -> Identifier
+HarpyEntrySelected     -> Normal
+HarpyEntrySelectedFile -> Identifier
+HarpyFileNotFound      -> Removed
+HarpyHelpText          -> Comment
+HarpyMenuBg            -> PMenu
+HarpyMenuBorder        -> PMenu
+```
 
 You can play around with these as you would any other highlight group.
-
-## TODOs
-- [x] add ability to clear not-found list
-- [x] add ability to enter buffers
-- [x] add ability to delete files
-- [x] structure as plugin
-- [x] test on some other project dirs
-- [x] add option dict instead of global
-- [x] adding files from the command line (e.g. `:HarpyAdd path/to/file`)
-- [x] reordering menu items
-- [x] refactor and use autoload
-- [ ] support arrow and modifier keys
-- [ ] support multikey input (e.g. `dd` to delete)
-- [ ] optimizing the logic overall (harpy is naively implemented right now)
-- [x] write help
-- [ ] undo delete?
