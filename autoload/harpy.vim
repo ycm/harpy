@@ -71,9 +71,8 @@ enddef
 
 
 def Save()
-    var lines_to_write = [
-        g:harpy_info.sel_idx] + g:harpy_info.valid + g:harpy_info.invalid
-    writefile(lines_to_write, g:harpy_opts.file_name)
+    var lines = [g:harpy_info.sel_idx] + g:harpy_info.valid + g:harpy_info.invalid
+    writefile(lines, g:harpy_opts.file_name)
 enddef
 
 
@@ -136,7 +135,7 @@ def Refresh()
     popup_settext(g:harpy_info.winid, g:harpy_info.menu_)
 enddef
 
-def FormatLine(text: string, style: string): any
+def FormatLine(text: string, style: string): dict<any>
     if style == 'help'
         return {
             text: text,
@@ -281,11 +280,7 @@ def OpenWindowHandler(winid: number, option: string): bool
 enddef
 
 
-def FormatString(str: string, prop: string): any
-    return {text: str, props: [{col: 1, length: str->len(), type: prop}]}
-enddef
-
-def CreateMenu(): any
+def CreateMenu(): list<dict<any>>
     var menu_ = []
     if g:harpy_info.valid->len() == 0
         menu_ += [{text: 'No valid files found!'}, {}]
@@ -322,7 +317,7 @@ def CreateMenu(): any
 enddef
 
 
-def HandleInput(winid: number, key: string): any
+def HandleInput(winid: number, key: string): bool
     var k_ = (key == ' ') ? '<Space>' : key
     k_ = (key == '') ? '<Enter>' : key
 
@@ -372,6 +367,6 @@ def HandleInput(winid: number, key: string): any
 enddef
 
 
-def HandleExit(winid: number, option: number)
+def HandleExit(_, _)
     Save()
 enddef
