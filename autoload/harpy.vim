@@ -322,7 +322,7 @@ enddef
 
 def HandleInput(winid: number, key: string): bool
     var k_ = (key == ' ') ? '<Space>' : key
-    k_ = (key == '') ? '<Enter>' : key
+    k_ = (key == '') ? '<Enter>' : k_
 
     if index(g:harpy_opts.keys_split_right, k_) >= 0
         return OpenWindowHandler(winid, 'right')
