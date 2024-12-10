@@ -1,6 +1,7 @@
 vim9script
 
 
+
 export def Run()
     if !exists('g:harpy_info')
         Init()
@@ -168,8 +169,8 @@ def Init()
         min_width: 40,
         pointer:    ' > ',
         no_pointer: '   ',
-        keys_down:            ['j'],
-        keys_up:              ['k'],
+        keys_down:            ['j', '<Down>'],
+        keys_up:              ['k', '<Up>'],
         keys_move_down:       ['J'],
         keys_move_up:         ['K'],
         keys_open:            ['<Enter>', '<Space>'],
@@ -320,9 +321,24 @@ def CreateMenu(): list<dict<any>>
 enddef
 
 
+var keycodes = {
+    9: '<Tab>',
+    13: '<Enter>',
+    27: '<Esc>',
+    32: '<Space>',
+    'ku': '<Up>',
+    'kd': '<Down>',
+    'kl': '<Left>',
+    'kr': '<Right>'
+    'kb': '<Bksp>',
+    'kD': '<Del>'
+}
+
+
 def HandleInput(winid: number, key: string): bool
-    var k_ = (key == ' ') ? '<Space>' : key
-    k_ = (key == '') ? '<Enter>' : k_
+    var k_ = key->len() == 3
+    \   ? get(keycodes, key[1 : ], key)
+    \   : get(keycodes, char2nr(key), key)
 
     if index(g:harpy_opts.keys_split_right, k_) >= 0
         return OpenWindowHandler(winid, 'right')
@@ -334,10 +350,10 @@ def HandleInput(winid: number, key: string): bool
         return OpenWindowHandler(winid, 'top')
     elseif index(g:harpy_opts.keys_open, k_) >= 0
         execute $'drop {g:harpy_info.valid[g:harpy_info.sel_idx]}'
-        return popup_filter_menu(winid, '')
+        return popup_filter_menu(winid, nr2char(13))
     elseif index(g:harpy_opts.keys_open_in_tab, k_) >= 0
         execute $'tabnew {g:harpy_info.valid[g:harpy_info.sel_idx]}'
-        return popup_filter_menu(winid, '')
+        return popup_filter_menu(winid, nr2char(13))
     elseif index(g:harpy_opts.keys_down, k_) >= 0
         g:harpy_info.sel_idx = [g:harpy_info.sel_idx + 1,
             g:harpy_info.valid->len() - 1]->min()
@@ -366,7 +382,7 @@ def HandleInput(winid: number, key: string): bool
         g:harpy_info.show_help = 1 - g:harpy_info.show_help
         ToggleHelp()
         Refresh()
-    else # catch <Esc>, <C-c>, etc.
+    elseif k_ == '<Esc>' || k_ == 'x'
         return popup_filter_menu(winid, key)
     endif
     return true
