@@ -329,7 +329,7 @@ var keycodes = {
     'ku': '<Up>',
     'kd': '<Down>',
     'kl': '<Left>',
-    'kr': '<Right>'
+    'kr': '<Right>',
     'kb': '<Bksp>',
     'kD': '<Del>'
 }
