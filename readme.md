@@ -12,7 +12,7 @@ Unlike harpoon, harpy's menu is not a regular text buffer - as such, harpy does 
 
 Requires Vim 9+.
 
-![vim-plug](https://github.com/junegunn/vim-plug):
+[vim-plug](https://github.com/junegunn/vim-plug):
 ```vim
 Plug 'ycm/harpy'
 ```
