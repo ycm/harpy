@@ -2,7 +2,7 @@ vim9script
 
 
 export def Run()
-    if !exists('g:harpy_info')
+    if !'g:harpy_info'->exists()
         Init()
     endif
     LoadFiles()
