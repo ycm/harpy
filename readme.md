@@ -1,3 +1,7 @@
+### Deprecated!
+
+[poplar.vim](https://github.com/ycm/poplar.vim) is better and includes a filetree.
+
 <h1 align="center">harpy</h1>
 
 <p align="center">A small set of <a href="https://github.com/ThePrimeagen/harpoon">harpoon</a>-like features for my personal use case.</p>
